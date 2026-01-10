@@ -20,6 +20,14 @@ $ curl http://localhost:2954/accent -H "Content-Type: application/json" -d '{"te
 {"accent":"コンニチワ'、セ'カイ"}
 ```
 
+## License
+
+This project is licensed under the BSD 3-Clause License.
+
+The algorithm implementations in `src/` are derived from TASET (Tokyo Accent Sandhi Estimation Toolkit) with minor refactoring.
+
+See [LICENSE](LICENSE) for the full license text.
+
 ## Libraries
 
 ### Tokyo Accent Sandhi Estimation Toolkit: TASET
