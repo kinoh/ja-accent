@@ -10,6 +10,16 @@
   - cabocha's bundled model does not have an open license
 - Accent prediction: TASET (CRF + rule-based)
 
+## Usage
+
+```
+$ task build
+$ task run
+
+$ curl http://localhost:2954/accent -H "Content-Type: application/json" -d '{"text":"こんにちは、世界。"}'
+{"accent":"コンニチワ'、セ'カイ"}
+```
+
 ## Libraries
 
 ### Tokyo Accent Sandhi Estimation Toolkit: TASET
