@@ -1,0 +1,49 @@
+FROM ubuntu:latest AS build
+
+RUN apt-get update && apt-get install -y build-essential
+
+WORKDIR /app
+
+COPY packages/CRF++-0.58.tar.gz ./
+RUN tar -xzf CRF++-0.58.tar.gz && \
+    cd /app/CRF++-0.58 && \
+    sh ./configure && \
+    make && \
+    make install && \
+    make clean
+
+COPY packages/mecab-0.996.tar.gz ./
+RUN tar -xzf mecab-0.996.tar.gz && \
+    cd /app/mecab-0.996 && \
+    ./configure && \
+    make && \
+    make install && \
+    make clean
+
+FROM python:3.13 AS runtime
+
+WORKDIR /usr/src/app
+
+RUN apt-get update && apt-get install -y unzip
+
+COPY packages/unidic-csj-202512.zip ./
+RUN unzip unidic-csj-202512.zip -d /usr/src/app/unidic
+
+COPY requirements.txt ./
+RUN pip install --no-cache-dir -r requirements.txt
+
+ENV LD_LIBRARY_PATH="/usr/local/lib"
+
+COPY --from=build /usr/local/bin/crf_test /usr/local/bin/
+COPY --from=build /usr/local/bin/mecab /usr/local/bin/
+COPY --from=build /usr/local/lib/libcrfpp.so* /usr/local/lib/
+COPY --from=build /usr/local/lib/libmecab.so* /usr/local/lib/
+COPY --from=build /usr/local/etc/mecabrc /usr/local/etc/mecabrc
+COPY --from=build /usr/local/libexec/mecab/mecab-dict-index /usr/local/libexec/mecab/mecab-dict-index
+
+COPY src/user.dic ./
+COPY src/model_accent ./
+
+COPY src/*.py .
+
+CMD [ "python", "./text2accent.py", "--mecab-dicdir", "/usr/src/app/unidic", "--mecab-userdic", "/usr/src/app/user.dic" ]

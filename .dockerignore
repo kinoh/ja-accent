@@ -1,0 +1,4 @@
+.venv
+.dockerignore
+Dockerfile
+unidic-csj-*_full

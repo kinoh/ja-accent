@@ -1,0 +1,20 @@
+version: '3'
+
+tasks:
+  build: 
+    desc: Build docker image
+    cmds:
+      - uv export --format requirements.txt > requirements.txt
+      - docker build -t ja-accent:latest .
+
+  build/user-dict:
+    desc: Build user dictionary
+    cmds:
+      - |
+        [ -d ./unidic-csj-202512_full ] || { echo "Directory ./unidic-csj-202512_full does not exist."; exit 1; }
+      - docker run --rm -v .:/workspace ja-accent:latest /usr/local/libexec/mecab/mecab-dict-index -d/workspace/unidic-csj-202512_full/ -u /workspace/src/user.dic -f utf-8 -t utf-8 /workspace/src/user_dict.csv
+
+  eval:
+    desc: Evaluate accuracy
+    cmds:
+      - docker run --rm ja-accent:latest python eval.py
