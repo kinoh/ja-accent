@@ -12,6 +12,18 @@
 
 ## Usage
 
+### Setup
+
+Download UniDic dictionary (required for the first time):
+
+**Note:** By downloading, you agree to the UniDic license terms. See [UniDic official page](https://clrd.ninjal.ac.jp/unidic/) for details.
+
+```
+$ curl -o packages/unidic-csj-202512.zip https://clrd.ninjal.ac.jp/unidic_archive/2512/unidic-csj-202512.zip
+```
+
+### Running
+
 ```
 $ task build
 $ task run
