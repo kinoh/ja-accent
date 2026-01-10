@@ -318,6 +318,8 @@ def process_text(input_text: str, mecab_dicdir: str, mecab_userdic: str | None) 
     Returns:
         Accent-annotated text
     """
+    input_text = input_text.replace("〜", "ー").replace("～", "ー")
+
     phrase_segmented_text = split_by_pyopenjtalk(input_text)
     formatted_features_2nd = seikei_from_mecab(
         phrase_segmented_text, mecab_dicdir, mecab_userdic
