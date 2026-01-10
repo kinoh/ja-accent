@@ -51,4 +51,4 @@ ENV MECAB_USERDIC="/usr/src/app/user.dic"
 
 EXPOSE 2954
 
-CMD ["uvicorn", "server:app", "--host", "0.0.0.0", "--port", "2954"]
+CMD ["uvicorn", "server:app", "--host", "0.0.0.0", "--port", "2954", "--no-access-log"]
