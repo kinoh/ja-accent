@@ -14,6 +14,11 @@ tasks:
         [ -d ./unidic-csj-202512_full ] || { echo "Directory ./unidic-csj-202512_full does not exist."; exit 1; }
       - docker run --rm -v .:/workspace ja-accent:latest /usr/local/libexec/mecab/mecab-dict-index -d/workspace/unidic-csj-202512_full/ -u /workspace/src/user.dic -f utf-8 -t utf-8 /workspace/src/user_dict.csv
 
+  run:
+    desc: Run the application
+    cmds:
+      - docker run --rm -p 2954:2954 ja-accent:latest
+
   eval:
     desc: Evaluate accuracy
     cmds:

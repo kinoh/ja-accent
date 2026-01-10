@@ -49,6 +49,6 @@ COPY src/*.py .
 ENV MECAB_DICDIR="/usr/src/app/unidic"
 ENV MECAB_USERDIC="/usr/src/app/user.dic"
 
-EXPOSE 8000
+EXPOSE 2954
 
-CMD ["uvicorn", "server:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "server:app", "--host", "0.0.0.0", "--port", "2954"]
