@@ -307,13 +307,17 @@ def normalize_punctuation(text):
     return text
 
 
-def main():
-    args = parse_args()
-    input_text = sys.stdin.read()
+def process_text(input_text: str, mecab_dicdir: str, mecab_userdic: str | None) -> str:
+    """Process text and return accent-annotated result.
 
-    mecab_dicdir = args.mecab_dicdir
-    mecab_userdic = args.mecab_userdic if args.mecab_userdic else None
+    Args:
+        input_text: Input text to process
+        mecab_dicdir: MeCab dictionary directory path
+        mecab_userdic: MeCab user dictionary path (None to disable)
 
+    Returns:
+        Accent-annotated text
+    """
     phrase_segmented_text = split_by_pyopenjtalk(input_text)
     formatted_features_2nd = seikei_from_mecab(
         phrase_segmented_text, mecab_dicdir, mecab_userdic
@@ -331,6 +335,17 @@ def main():
     else:
         result = ""
 
+    return result
+
+
+def main():
+    args = parse_args()
+    input_text = sys.stdin.read()
+
+    mecab_dicdir = args.mecab_dicdir
+    mecab_userdic = args.mecab_userdic if args.mecab_userdic else None
+
+    result = process_text(input_text, mecab_dicdir, mecab_userdic)
     print(result)
 
 

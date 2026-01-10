@@ -46,4 +46,9 @@ COPY src/model_accent ./
 
 COPY src/*.py .
 
-CMD [ "python", "./text2accent.py", "--mecab-dicdir", "/usr/src/app/unidic", "--mecab-userdic", "/usr/src/app/user.dic" ]
+ENV MECAB_DICDIR="/usr/src/app/unidic"
+ENV MECAB_USERDIC="/usr/src/app/user.dic"
+
+EXPOSE 8000
+
+CMD ["uvicorn", "server:app", "--host", "0.0.0.0", "--port", "8000"]
