@@ -1,6 +1,10 @@
-FROM ubuntu:latest AS build
+FROM debian:bookworm-slim AS build
 
-RUN apt-get update && apt-get install -y build-essential
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+        g++ \
+        make && \
+    rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
@@ -10,7 +14,8 @@ RUN tar -xzf CRF++-0.58.tar.gz && \
     sh ./configure && \
     make && \
     make install && \
-    make clean
+    cd /app && \
+    rm -rf CRF++-0.58 CRF++-0.58.tar.gz
 
 COPY packages/mecab-0.996.tar.gz ./
 RUN tar -xzf mecab-0.996.tar.gz && \
@@ -18,16 +23,20 @@ RUN tar -xzf mecab-0.996.tar.gz && \
     ./configure && \
     make && \
     make install && \
-    make clean
+    cd /app && \
+    rm -rf mecab-0.996 mecab-0.996.tar.gz
 
-FROM python:3.13 AS runtime
+FROM python:3.13-slim AS runtime
 
 WORKDIR /usr/src/app
 
-RUN apt-get update && apt-get install -y unzip
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends unzip && \
+    rm -rf /var/lib/apt/lists/*
 
 COPY packages/unidic-csj-202512.zip ./
-RUN unzip unidic-csj-202512.zip -d /usr/src/app/unidic
+RUN unzip -q unidic-csj-202512.zip -d /usr/src/app/unidic && \
+    rm unidic-csj-202512.zip
 
 COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
