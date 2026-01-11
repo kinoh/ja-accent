@@ -1,0 +1,28 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(cat:*)",
+      "Bash(curl:*)",
+      "Bash(echo:*)",
+      "Bash(find:*)",
+      "Bash(git add:*)",
+      "Bash(git log:*)",
+      "Bash(git rev-parse:*)",
+      "Bash(grep:*)",
+      "Bash(ls:*)",
+      "Bash(mkdir:*)",
+      "Bash(touch:*)",
+      "mcp__context7__*",
+      "mcp__deepwiki__*",
+      "mcp__serena__*",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:stackoverflow.com)",
+      "WebSearch",
+      "Bash(docker exec:*)",
+      "Bash(docker restart:*)",
+      "Bash(uv export:*)",
+      "Bash(task build)",
+      "Bash(task eval)"
+    ]
+  }
+}
