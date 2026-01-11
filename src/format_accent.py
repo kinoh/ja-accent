@@ -121,7 +121,11 @@ def format_accent_text(text):
                         # '/'を除去して補助記号を追加
                         formatted = formatted[:-1] + aux_orth
                     elif aux_boundary == '/':
-                        separators.append(aux_orth)
+                        # ？は文末が上がる韻律なので保持、それ以外は、に変換
+                        if aux_orth == '？':
+                            separators.append('？')
+                        else:
+                            separators.append('、')
                 # boundary_flag == '/'の補助記号は句間に出力
                 auxiliary_buffer = []
             output_parts.append(formatted)
@@ -149,16 +153,20 @@ def format_accent_text(text):
                     # '/'を除去して補助記号を追加
                     formatted = formatted[:-1] + aux_orth
                 elif aux_boundary == '/':
-                    separators.append(aux_orth)
+                    # ？は文末が上がる韻律なので保持、それ以外は、に変換
+                    if aux_orth == '？':
+                        separators.append('？')
+                    else:
+                        separators.append('、')
             # boundary_flag == '/'の補助記号は後で出力
             auxiliary_buffer = []
         output_parts.append(formatted)
         if separators:
             output_parts.extend(separators)
 
-    # 残っている補助記号があれば追加
+    # 残っている補助記号があれば追加（？は保持、それ以外は、に変換）
     if auxiliary_buffer:
-        output_parts.extend([o for o, b in auxiliary_buffer])
+        output_parts.extend(['？' if (b == '/' and o == '？') else ('、' if b == '/' else o) for o, b in auxiliary_buffer])
 
     if output_parts:
         result = "".join(output_parts)

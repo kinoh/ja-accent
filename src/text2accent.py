@@ -120,7 +120,35 @@ def seikei_from_mecab(text, mecab_dicdir, mecab_userdic):
                 f[ii] = "*"
 
         irex = "O"
-        if len(f) == 25:
+        # Unknown words without pronunciation info should be treated as auxiliary symbols
+        if len(f) < 25:
+            # Get the surface form from the original line
+            surface = line.split("\t")[0] if "\t" in line else "o"
+            output.append(
+                "%s %s %s-%s-%s-%s %s %s %s-%s %s %s-%s-%s %s %s %s %s %s"
+                % (
+                    surface,
+                    "*",
+                    f[0] if len(f) > 0 else "*",
+                    f[1] if len(f) > 1 else "*",
+                    f[2] if len(f) > 2 else "*",
+                    f[3] if len(f) > 3 else "*",
+                    f[4] if len(f) > 4 else "*",
+                    "*",
+                    "*",
+                    "*",
+                    "*",
+                    "*",
+                    "*",
+                    "*",
+                    "*",
+                    "*",
+                    "*",
+                    irex,
+                    bunsetsu_flag,
+                )
+            )
+        elif len(f) == 25:
             output.append(
                 "%s %s %s-%s-%s-%s %s %s %s-%s %s %s-%s-%s %s %s %s %s %s"
                 % (
@@ -170,8 +198,6 @@ def seikei_from_mecab(text, mecab_dicdir, mecab_userdic):
                     bunsetsu_flag,
                 )
             )
-        else:
-            output.append("o o o-o-o-o o o o-o o-o-o o o-o o o o")
 
         bunsetsu_flag = "-"
 
@@ -302,7 +328,9 @@ def normalize_punctuation(text):
     text = text.replace("/？", "？")
     text = text.replace("'？", "？")
 
-    text = text.strip("/、")
+    # Strip / and 、 from start and end, but preserve ？
+    text = text.strip("/")
+    text = text.strip("、")
 
     return text
 
