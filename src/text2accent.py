@@ -59,7 +59,8 @@ def split_by_pyopenjtalk(text):
     if buffer:
         phrases.append("".join(buffer))
 
-    return "\n".join(phrases).replace(" ", "")
+    result = "\n".join(phrases)
+    return "".join(ch for ch in result if ch == "\n" or not ch.isspace())
 
 
 def parse_args():
