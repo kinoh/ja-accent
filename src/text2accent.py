@@ -32,6 +32,13 @@ def csvsplit(string):
     return outlist
 
 
+def normalize_missing_pronunciation(orth: str, pron: str) -> str:
+    """Normalize pronunciation only when it is missing and orth can fill it."""
+    if pron == "*" and orth == "っ":
+        return "ッ"
+    return pron
+
+
 def split_by_pyopenjtalk(text):
     """Segment text into accent phrases using pyopenjtalk"""
     try:
@@ -150,11 +157,13 @@ def seikei_from_mecab(text, mecab_dicdir, mecab_userdic):
                 )
             )
         elif len(f) == 25:
+            orth = f[8]
+            pron = normalize_missing_pronunciation(orth, f[9])
             output.append(
                 "%s %s %s-%s-%s-%s %s %s %s-%s %s %s-%s-%s %s %s %s %s %s"
                 % (
-                    f[8],
-                    f[9],
+                    orth,
+                    pron,
                     f[0],
                     f[1],
                     f[2],
@@ -175,11 +184,13 @@ def seikei_from_mecab(text, mecab_dicdir, mecab_userdic):
                 )
             )
         elif len(f) >= 29:
+            orth = f[8]
+            pron = normalize_missing_pronunciation(orth, f[9])
             output.append(
                 "%s %s %s-%s-%s-%s %s %s %s-%s %s %s-%s-%s %s %s %s %s %s"
                 % (
-                    f[8],
-                    f[9],
+                    orth,
+                    pron,
                     f[0],
                     f[1],
                     f[2],
