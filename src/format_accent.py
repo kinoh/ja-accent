@@ -82,6 +82,33 @@ def format_accent_text(text):
     output_parts = []
     auxiliary_buffer = []  # 補助記号のバッファ
 
+    def flush_phrase_buffer():
+        nonlocal phrase_buffer, auxiliary_buffer
+        if not phrase_buffer:
+            return
+        formatted = format_phrase(phrase_buffer)
+        separators = []
+        if auxiliary_buffer:
+            for aux_orth, aux_boundary in auxiliary_buffer:
+                if aux_boundary == '-':
+                    # Keep the phrase boundary for standalone marks that will be normalized later.
+                    if aux_orth in auxiliary_keep_boundary:
+                        formatted = formatted[:-1] + aux_orth + "/"
+                    else:
+                        # '/'を除去して補助記号を追加
+                        formatted = formatted[:-1] + aux_orth
+                elif aux_boundary == '/':
+                    # ？は文末が上がる韻律なので保持、それ以外は、に変換
+                    if aux_orth == '？':
+                        separators.append('？')
+                    else:
+                        separators.append('、')
+            auxiliary_buffer = []
+        output_parts.append(formatted)
+        if separators:
+            output_parts.extend(separators)
+        phrase_buffer = []
+
     for line in text.splitlines():
         if len(line.strip()) == 0:
             # 空行は無視（EOFまで1つの文として処理）
@@ -100,6 +127,8 @@ def format_accent_text(text):
             # boundary_flagに基づいて処理を分ける
             # '/'の場合は次のアクセント句の前、'-'の場合は現在のアクセント句の後
             auxiliary_buffer.append((orth, boundary_flag))
+            if boundary_flag == '/' and phrase_buffer:
+                flush_phrase_buffer()
             continue
 
         nmora = int(features[13])  # モーラ数
@@ -113,31 +142,7 @@ def format_accent_text(text):
 
         # アクセント句境界（/）の場合は、前のアクセント句を出力
         if boundary_flag == '/' and phrase_buffer:
-            # 前のアクセント句がある場合は出力
-            formatted = format_phrase(phrase_buffer)
-            # boundary_flag == '-'の補助記号があれば、'/'の前に挿入（/は除去）
-            separators = []
-            if auxiliary_buffer:
-                for aux_orth, aux_boundary in auxiliary_buffer:
-                    if aux_boundary == '-':
-                        # Keep the phrase boundary for standalone marks that will be normalized later.
-                        if aux_orth in auxiliary_keep_boundary:
-                            formatted = formatted[:-1] + aux_orth + "/"
-                        else:
-                            # '/'を除去して補助記号を追加
-                            formatted = formatted[:-1] + aux_orth
-                    elif aux_boundary == '/':
-                        # ？は文末が上がる韻律なので保持、それ以外は、に変換
-                        if aux_orth == '？':
-                            separators.append('？')
-                        else:
-                            separators.append('、')
-                # boundary_flag == '/'の補助記号は句間に出力
-                auxiliary_buffer = []
-            output_parts.append(formatted)
-            if separators:
-                output_parts.extend(separators)
-            phrase_buffer = []
+            flush_phrase_buffer()
 
         # データを保存
         phrase_buffer.append({
@@ -150,29 +155,7 @@ def format_accent_text(text):
 
     # 最後に残っているバッファがあれば処理
     if phrase_buffer:
-        formatted = format_phrase(phrase_buffer)
-        # boundary_flag == '-'の補助記号があれば、'/'の前に挿入（/は除去）
-        separators = []
-        if auxiliary_buffer and formatted.endswith('/'):
-            for aux_orth, aux_boundary in auxiliary_buffer:
-                if aux_boundary == '-':
-                    # Keep the phrase boundary for standalone marks that will be normalized later.
-                    if aux_orth in auxiliary_keep_boundary:
-                        formatted = formatted[:-1] + aux_orth + "/"
-                    else:
-                        # '/'を除去して補助記号を追加
-                        formatted = formatted[:-1] + aux_orth
-                elif aux_boundary == '/':
-                    # ？は文末が上がる韻律なので保持、それ以外は、に変換
-                    if aux_orth == '？':
-                        separators.append('？')
-                    else:
-                        separators.append('、')
-            # boundary_flag == '/'の補助記号は後で出力
-            auxiliary_buffer = []
-        output_parts.append(formatted)
-        if separators:
-            output_parts.extend(separators)
+        flush_phrase_buffer()
 
     # 残っている補助記号があれば追加（？は保持、それ以外は、に変換）
     if auxiliary_buffer:
