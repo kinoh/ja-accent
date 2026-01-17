@@ -75,6 +75,8 @@ def format_phrase(phrase_data):
     return "".join(result)
 
 def format_accent_text(text):
+    auxiliary_keep_boundary = {"ー"}
+
     # バッファに1アクセント句を保存
     phrase_buffer = []
     output_parts = []
@@ -118,8 +120,12 @@ def format_accent_text(text):
             if auxiliary_buffer:
                 for aux_orth, aux_boundary in auxiliary_buffer:
                     if aux_boundary == '-':
-                        # '/'を除去して補助記号を追加
-                        formatted = formatted[:-1] + aux_orth
+                        # Keep the phrase boundary for standalone marks that will be normalized later.
+                        if aux_orth in auxiliary_keep_boundary:
+                            formatted = formatted[:-1] + aux_orth + "/"
+                        else:
+                            # '/'を除去して補助記号を追加
+                            formatted = formatted[:-1] + aux_orth
                     elif aux_boundary == '/':
                         # ？は文末が上がる韻律なので保持、それ以外は、に変換
                         if aux_orth == '？':
@@ -150,8 +156,12 @@ def format_accent_text(text):
         if auxiliary_buffer and formatted.endswith('/'):
             for aux_orth, aux_boundary in auxiliary_buffer:
                 if aux_boundary == '-':
-                    # '/'を除去して補助記号を追加
-                    formatted = formatted[:-1] + aux_orth
+                    # Keep the phrase boundary for standalone marks that will be normalized later.
+                    if aux_orth in auxiliary_keep_boundary:
+                        formatted = formatted[:-1] + aux_orth + "/"
+                    else:
+                        # '/'を除去して補助記号を追加
+                        formatted = formatted[:-1] + aux_orth
                 elif aux_boundary == '/':
                     # ？は文末が上がる韻律なので保持、それ以外は、に変換
                     if aux_orth == '？':
